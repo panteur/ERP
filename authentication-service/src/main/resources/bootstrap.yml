@@ -1,0 +1,23 @@
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
+
+spring:
+  application:
+    name: authorization-service
+
+
+  cloud:
+    config:
+      username: user-config-service
+      password: 6112F72FF607B5B95E2E9B1662EE80A13F93ABCE7439196BD7032B3F84200AC5
+      uri: http://localhost:8081
+      fail-fast: true
+      enabled: true
+      retry:
+        initial-interval: 1000
+        max-interval: 2000
+        max-attempts: 6
+        multiplier: 1.1
+
