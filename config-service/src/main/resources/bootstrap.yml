@@ -1,0 +1,21 @@
+server:
+  port: 8081
+
+spring:
+  security:
+    user:
+      name: user-config-service
+      password: 6112F72FF607B5B95E2E9B1662EE80A13F93ABCE7439196BD7032B3F84200AC5
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/panteur/ERP.git
+          searchPaths: data-service
+          username: panteur@gmail.com
+          password: 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
+          defaultLabel: master
+        bootstrap: true
+      enable: true
+  application:
+    name: config-service
