@@ -1,0 +1,16 @@
+{
+  "id": 1,
+  "statusType": {
+    "id": 2,
+    "statusTypeAbrev": "ststp02",
+    "name": "StatusType02",
+    "description": "tipo de estado de prueba 02",
+    "createAt": "2024-06-25T18:17:24.187+00:00",
+    "updateAt": "2024-06-25T18:17:24.187+00:00"
+  },
+  "name": "status01",
+  "codint": "ststp02sts01",
+  "description": "status de prueba 1",
+  "createAt": null,
+  "updateAt": null
+}

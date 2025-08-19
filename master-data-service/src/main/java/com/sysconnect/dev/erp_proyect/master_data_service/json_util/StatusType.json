@@ -1,0 +1,8 @@
+{
+  "id": 1,
+  "statusTypeAbrev": "ststp01",
+  "name": "StatusType01",
+  "description": "tipo de estado de prueba",
+  "createAt": null,
+  "updateAt": null
+}
