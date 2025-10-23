@@ -50,10 +50,10 @@ public class LoadCriticity {
 
         //CRITICA
         criticity = new Criticity();
-        if (!criticityRepository.existsByName("CRITICA")) {
+        if (!criticityRepository.existsByName("MUY ALTA")) {
             criticity.setCodint("CRT_CRI");
-            criticity.setName("CRITICA");
-            criticity.setDescription("Criticidad Critica");
+            criticity.setName("MUY ALTA");
+            criticity.setDescription("Criticidad Muy alta");
             criticityRepository.save(criticity);
         }
 

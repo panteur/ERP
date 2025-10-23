@@ -12,8 +12,8 @@ spring:
         git:
           uri: https://github.com/panteur/ERP.git
           searchPaths: data-service
-          username: panteur@gmail.com
-          password: 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
+          username: ${GIT_USERNAME}
+          password: ${GIT_PASSWORD}
           defaultLabel: master
         bootstrap: true
       enable: true

@@ -10,8 +10,8 @@ spring:
 
   cloud:
     config:
-      username: user-config-service
-      password: 6112F72FF607B5B95E2E9B1662EE80A13F93ABCE7439196BD7032B3F84200AC5
+      username: ${CFG_USER}
+      password: ${CFG_PASSWORD}
       uri: http://localhost:8081
       fail-fast: true
       enabled: true
