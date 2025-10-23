@@ -4,8 +4,8 @@ server:
 spring:
   security:
     user:
-      name: user-config-service
-      password: 6112F72FF607B5B95E2E9B1662EE80A13F93ABCE7439196BD7032B3F84200AC5
+      name: ${CONFIG_SERVICE_USER}
+      password: ${CONFIG_SERVICE_PASSWORD}
   cloud:
     config:
       server:
@@ -16,6 +16,6 @@ spring:
           password: ${GIT_PASSWORD}
           defaultLabel: master
         bootstrap: true
-      enable: true
+#     enable: true
   application:
     name: config-service
