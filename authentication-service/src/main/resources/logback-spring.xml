@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOGS" value="./logs" />
+
+    <appender name="Console"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{ISO8601} %-5level [%thread] %logger{36} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="AuditFile"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/audit.log</file>
+        <encoder
+            class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%msg%n</Pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Rota el log cada día -->
+            <fileNamePattern>${LOGS}/archived/audit-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory> <!-- Guarda logs por 30 días -->
+        </rollingPolicy>
+        
+        <!-- Filtro para que solo los logs de auditoría vayan a este archivo -->
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator">
+                <expression>return message.startsWith("AUDIT");</expression>
+            </evaluator>
+            <OnMatch>ACCEPT</OnMatch>
+            <OnMismatch>DENY</OnMismatch>
+        </filter>
+    </appender>
+
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="Console" />
+    </root>
+
+    <!-- LOG "com.sysconnect.dev.erp_proyect.authentication_service" at TRACE level -->
+    <logger name="com.sysconnect.dev.erp_proyect.authentication_service" level="trace" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="AuditFile" />
+    </logger>
+
+</configuration>
