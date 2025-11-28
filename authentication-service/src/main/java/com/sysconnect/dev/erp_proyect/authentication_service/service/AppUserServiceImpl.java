@@ -2,6 +2,7 @@ package com.sysconnect.dev.erp_proyect.authentication_service.service;
 
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.CreateAppUserDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.MessageDto;
+import com.sysconnect.dev.erp_proyect.authentication_service.dto.UpdatePasswordDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.AppUser;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.Role;
 import com.sysconnect.dev.erp_proyect.authentication_service.enums.RoleName;
@@ -12,11 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.sysconnect.dev.erp_proyect.authentication_service.utils.GeneradorCadenasAleatorias.generarCadenaAleatoria;
 
@@ -28,12 +29,16 @@ public class AppUserServiceImpl implements AppUserService {
     private final AppUserRepository appUserRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public MessageDto createUser(CreateAppUserDto dto) {
+        String verificationToken = UUID.randomUUID().toString();
         AppUser appUser = AppUser.builder()
                 .username(dto.username())
                 .password(passwordEncoder.encode(dto.password()))
                 .email(dto.email())
+                .verificationToken(verificationToken)
+                .emailVerified(false) // Por defecto, el email no está verificado
                 .build();
 
         Set<Role> roles = new HashSet<>();
@@ -44,7 +49,28 @@ public class AppUserServiceImpl implements AppUserService {
         });
         appUser.setRoles(roles);
         appUserRepository.save(appUser);
-        return new MessageDto("user " + appUser.getUsername() + " saved");
+        
+        // Enviar correo de verificación
+        String verificationLink = "http://localhost:9000/auth/verify-account?token=" + verificationToken;
+        String subject = "Verifica tu cuenta";
+        String body = "Hola " + appUser.getUsername() + ",\n\n"
+                + "Gracias por registrarte. Por favor, haz clic en el siguiente enlace para verificar tu correo electrónico:\n"
+                + verificationLink;
+        emailService.sendEmail(appUser.getEmail(), subject, body);
+        
+        return new MessageDto("Usuario " + appUser.getUsername() + " guardado. Se ha enviado un correo de verificación.");
+    }
+
+    @Override
+    public MessageDto verifyAccount(String token) {
+        AppUser appUser = appUserRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new RuntimeException("Token de verificación inválido."));
+
+        appUser.setEmailVerified(true);
+        appUser.setVerificationToken(null); // Limpiar el token para que no se pueda usar de nuevo
+        appUserRepository.save(appUser);
+
+        return new MessageDto("¡Tu cuenta ha sido verificada exitosamente!");
     }
 
     @Override
@@ -107,22 +133,38 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public MessageDto changePassword(String rut, String newPassword) {
-        AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
-        if (appUserDB == null) return null;
-        appUserDB.setPassword(passwordEncoder.encode(newPassword));
-        appUserDB.setPasswordIsNew(false);
-        return new MessageDto("user " + appUserDB.getUsername() + " Contraseña cambiada");
+    public MessageDto updatePassword(UpdatePasswordDto dto) {
+        AppUser appUser = appUserRepository.findByEmail(dto.email())
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + dto.email()));
+
+        if (!passwordEncoder.matches(dto.currentPassword(), appUser.getPassword())) {
+            throw new RuntimeException("Invalid current password");
+        }
+
+        appUser.setPassword(passwordEncoder.encode(dto.newPassword()));
+        appUserRepository.save(appUser);
+
+        // Enviar correo de notificación
+        String subject = "Actualización de contraseña";
+        String body = "Hola " + appUser.getUsername() + ",\n\nTu contraseña ha sido actualizada exitosamente. Si no has sido tú, por favor, contacta con nosotros.";
+        emailService.sendEmail(appUser.getEmail(), subject, body);
+
+        return new MessageDto("Password updated successfully for user: " + appUser.getUsername());
     }
 
     @Override
     public AppUser resetPassword(String rut) {
-        String cadenaAleatoria = generarCadenaAleatoria(20);
+        String newPassword = generarCadenaAleatoria(20);
         AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
         if (appUserDB == null) return null;
-        appUserDB.setPassword(passwordEncoder.encode((cadenaAleatoria)));
+        appUserDB.setPassword(passwordEncoder.encode((newPassword)));
         appUserDB.setPasswordIsNew(true);
-        // envio via email la nueva contraseña
+        
+        // Enviar la nueva contraseña por correo
+        String subject = "Restablecimiento de contraseña";
+        String body = "Hola " + appUserDB.getUsername() + ",\n\nTu nueva contraseña es: " + newPassword;
+        emailService.sendEmail(appUserDB.getEmail(), subject, body);
+
         return appUserDB;
     }
 

@@ -10,7 +10,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/panteur/ERP.git
+          uri: ${GIT_URI}
           searchPaths: data-service
           username: ${GIT_USERNAME}
           password: ${GIT_PASSWORD}

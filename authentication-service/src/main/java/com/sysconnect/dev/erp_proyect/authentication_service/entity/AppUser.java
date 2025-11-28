@@ -38,6 +38,9 @@ public class AppUser implements UserDetails {
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified = false;
 
+    @Column(name = "verification_token", nullable = true)
+    private String verificationToken;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "app_user_role",
             joinColumns = @JoinColumn(name = "appUser_id"),

@@ -26,6 +26,15 @@ public class LoadStatusUser {
         }
 
         status = new Status();
+        if (!statusRepository.existsByStatusType_IdAndCodint(1L,"STS_USR_NEW")){
+            status.setCodint("STS_USR_NEW");
+            status.setName("NUEVO");
+            status.setDescription("Estado de usuario nuevo sin validacion de correo");
+            status.setStatusType(statusTypeRepository.findById(1L).orElse(null));
+            statusRepository.save(status);
+        }
+
+        status = new Status();
         if (!statusRepository.existsByStatusType_IdAndCodint(1L,"STS_USR_TEMP_ACTIVO")){
             status.setCodint("STS_USR_TEMP_ACTIVO");
             status.setName("TEMP_ACTIVO");

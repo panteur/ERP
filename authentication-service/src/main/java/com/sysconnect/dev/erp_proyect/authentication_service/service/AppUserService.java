@@ -2,6 +2,7 @@ package com.sysconnect.dev.erp_proyect.authentication_service.service;
 
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.CreateAppUserDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.MessageDto;
+import com.sysconnect.dev.erp_proyect.authentication_service.dto.UpdatePasswordDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.AppUser;
 
 import java.util.Date;
@@ -10,6 +11,8 @@ import java.util.List;
 public interface AppUserService {
 
     public MessageDto createUser(CreateAppUserDto dto);
+
+    public MessageDto verifyAccount(String token);
 
     public AppUser findByRut(String rut);
 
@@ -23,13 +26,15 @@ public interface AppUserService {
 
     public MessageDto disabledAccount(String rut);
 
+
+
     public MessageDto lockedAccount(String rut);
 
     public MessageDto unLocketAccount(String rut);
 
     public MessageDto enableAccount(String rut);
 
-    public MessageDto changePassword(String rut, String newPassword);
+    public MessageDto updatePassword(UpdatePasswordDto dto);
 
     public AppUser resetPassword(String rut);
 
