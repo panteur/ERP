@@ -7,17 +7,21 @@ spring:
   application:
     name: authorization-service
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: sservex@gmail.com
-    password: vxpvrjpmomawoddl
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          master-data-service:
+            provider: self
+            client-id: entity-service-cli
+            client-secret: secret
+            authorization-grant-type: client_credentials
+            scope: openid
+        provider:
+          self:
+            token-uri: http://localhost:9000/oauth2/token
 
   cloud:
     config:

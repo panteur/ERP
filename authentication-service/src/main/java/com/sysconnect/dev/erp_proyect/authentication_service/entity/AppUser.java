@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.sysconnect.dev.erp_proyect.authentication_service.model.Status;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -40,6 +41,12 @@ public class AppUser implements UserDetails {
 
     @Column(name = "verification_token", nullable = true)
     private String verificationToken;
+
+    @Column(name = "status_id", nullable = false)
+    private Long statusId;
+
+    @Transient
+    private Status status;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "app_user_role",

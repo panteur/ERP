@@ -3,9 +3,12 @@ package com.sysconnect.dev.erp_proyect.authentication_service.service;
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.CreateAppUserDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.MessageDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.UpdatePasswordDto;
+import com.sysconnect.dev.erp_proyect.authentication_service.dto.UserDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.AppUser;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.Role;
 import com.sysconnect.dev.erp_proyect.authentication_service.enums.RoleName;
+import com.sysconnect.dev.erp_proyect.authentication_service.feignclients.StatusFeignClient;
+import com.sysconnect.dev.erp_proyect.authentication_service.model.Status;
 import com.sysconnect.dev.erp_proyect.authentication_service.repository.AppUserRepository;
 import com.sysconnect.dev.erp_proyect.authentication_service.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.sysconnect.dev.erp_proyect.authentication_service.utils.GeneradorCadenasAleatorias.generarCadenaAleatoria;
 
@@ -30,6 +34,7 @@ public class AppUserServiceImpl implements AppUserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final StatusFeignClient statusFeignClient;
 
     public MessageDto createUser(CreateAppUserDto dto) {
         String verificationToken = UUID.randomUUID().toString();
@@ -40,6 +45,8 @@ public class AppUserServiceImpl implements AppUserService {
                 .verificationToken(verificationToken)
                 .emailVerified(false) // Por defecto, el email no está verificado
                 .build();
+
+        appUser.setStatusId(2L); // Asignar 2 por defecto
 
         Set<Role> roles = new HashSet<>();
         dto.roles().forEach(r -> {
@@ -74,6 +81,45 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public UserDto findUserWithStatusByUsername(String username) {
+        AppUser appUser = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Status status = statusFeignClient.getStatus(appUser.getStatusId());
+
+        return UserDto.builder()
+                .username(appUser.getUsername())
+                .email(appUser.getEmail())
+                .emailVerified(appUser.isEmailVerified())
+                .statusName(status.getName()) // Asumiendo que el objeto Status tiene un método getName()
+                .expired(appUser.isExpired())
+                .locked(appUser.isLocked())
+                .credentialsExpired(appUser.isCredentialsExpired())
+                .disabled(appUser.isDisabled())
+                .build();
+    }
+
+    @Override
+    public List<UserDto> findAllUsersWithStatus() {
+        List<AppUser> users = appUserRepository.findAll();
+        return users.stream()
+                .map(appUser -> {
+                    Status status = statusFeignClient.getStatus(appUser.getStatusId());
+                    return UserDto.builder()
+                            .username(appUser.getUsername())
+                            .email(appUser.getEmail())
+                            .emailVerified(appUser.isEmailVerified())
+                            .statusName(status.getName())
+                            .expired(appUser.isExpired())
+                            .locked(appUser.isLocked())
+                            .credentialsExpired(appUser.isCredentialsExpired())
+                            .disabled(appUser.isDisabled())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public AppUser findByRut(String rut) {return appUserRepository.findByRut(rut).orElse(null);}
 
     @Override
@@ -81,11 +127,6 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AppUser findByUsername(String username) {return appUserRepository.findByUsername(username).orElse(null);}
-
-    @Override
-    public List<AppUser> findAll() {return appUserRepository.findAll();}
-
-
 
     @Override
     public AppUser delete(Long id) {

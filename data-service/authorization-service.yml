@@ -8,6 +8,19 @@ spring:
     password: 'Mul7899968@@@'
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  ## Mail config
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: sservex@gmail.com
+    password: vxpvrjpmomawoddl
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   ## Spring JPA
   jpa:
     show-sql: true

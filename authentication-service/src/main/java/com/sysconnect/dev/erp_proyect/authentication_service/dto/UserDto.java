@@ -17,6 +17,8 @@ public class UserDto {
 
     private boolean emailVerified = false;
 
+    private String statusName;
+
     @Column(name = "expired", nullable = false)
     private boolean expired = false;
 

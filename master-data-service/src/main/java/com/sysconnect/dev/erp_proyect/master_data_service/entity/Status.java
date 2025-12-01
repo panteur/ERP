@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.sysconnect.dev.erp_proyect.master_data_service.entity.StatusType;
 
 import java.sql.Timestamp;
 
