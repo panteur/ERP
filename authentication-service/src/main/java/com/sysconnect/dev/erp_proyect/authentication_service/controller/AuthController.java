@@ -41,11 +41,13 @@ public class AuthController {
         return ResponseEntity.ok(appUserService.findUsersByStatus(statusId));
     }
 
+    /* Actualizacion de contraseña */
     @PostMapping("/update-password")
     public ResponseEntity<MessageDto> updatePassword(@RequestBody UpdatePasswordDto dto) {
         return ResponseEntity.ok(appUserService.updatePassword(dto));
     }
 
+    /* resetear contraseña */
     @PostMapping("/reset-password")
     public ResponseEntity<MessageDto> resetPassword(@RequestBody ResetPasswordRequestDto dto) {
         return ResponseEntity.ok(appUserService.resetPassword(dto));
