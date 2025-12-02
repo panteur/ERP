@@ -6,9 +6,14 @@ logging:
 spring:
   application:
     name: authorization-service
+  ## Spring Cache Caffeine
+  cache:
+    cache-names:
+      - statuses
+    caffeine:
+      spec: statuses=expireAfterWrite=1h
 
-
-
+  ## Spring Security OAuth2
   security:
     oauth2:
       client:
@@ -23,6 +28,7 @@ spring:
           self:
             token-uri: http://localhost:9000/oauth2/token
 
+  ## Config-service connection
   cloud:
     config:
       username: ${CFG_USER}
