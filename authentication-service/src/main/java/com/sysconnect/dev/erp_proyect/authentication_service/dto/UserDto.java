@@ -15,6 +15,8 @@ public class UserDto {
 
     private String email;
 
+    private String rut;
+
     private boolean emailVerified = false;
 
     private String statusName;
