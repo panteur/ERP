@@ -110,11 +110,15 @@ public class AppUser implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return !credentialsExpired;
+        // Conectamos nuestra lógica personalizada con Spring Security.
+        // Si la contraseña ha expirado, las credenciales no son válidas.
+        return !passwordExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return !disabled;
+        // Para que un usuario esté realmente habilitado, su cuenta no debe estar deshabilitada
+        // Y su correo debe estar verificado.
+        return !disabled && emailVerified;
     }
 }

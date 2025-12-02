@@ -10,9 +10,14 @@ import com.sysconnect.dev.erp_proyect.authentication_service.repository.AppUserR
 import com.sysconnect.dev.erp_proyect.authentication_service.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -25,13 +30,28 @@ import static com.sysconnect.dev.erp_proyect.authentication_service.utils.Genera
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AppUserServiceImpl implements AppUserService {
+public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
     private final AppUserRepository appUserRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final StatusFeignClient statusFeignClient;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        AppUser appUser = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+
+        // Comprobar si la contraseña ha expirado
+        if (appUser.getPasswordExpDate() != null && new Date().after(appUser.getPasswordExpDate())) {
+            appUser.setPasswordExpired(true);
+            // Opcional: podrías guardar este cambio en la BD si quieres que persista
+            // appUserRepository.save(appUser);
+        }
+
+        return appUser;
+    }
 
     public MessageDto createUser(CreateAppUserDto dto) {
         String verificationToken = UUID.randomUUID().toString();
@@ -205,6 +225,12 @@ public class AppUserServiceImpl implements AppUserService {
 
         appUser.setPassword(passwordEncoder.encode(dto.newPassword()));
         appUser.setPasswordIsNew(false); // La contraseña ya no es nueva
+
+        // Establecer la nueva fecha de expiración (90 días desde hoy)
+        LocalDate expirationDate = LocalDate.now().plusDays(90);
+        appUser.setPasswordExpDate(Date.from(expirationDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        appUser.setPasswordExpired(false); // La contraseña ahora es válida
+
         appUserRepository.save(appUser);
 
         // Enviar correo de notificación
@@ -223,6 +249,8 @@ public class AppUserServiceImpl implements AppUserService {
         String newPassword = generarCadenaAleatoria(8);
         appUser.setPassword(passwordEncoder.encode(newPassword));
         appUser.setPasswordIsNew(true); // La contraseña es nueva y debe ser cambiada
+        appUser.setPasswordExpDate(null); // La contraseña generada no tiene fecha de expiración
+        appUser.setPasswordExpired(true); // Forzar al usuario a cambiarla
         appUserRepository.save(appUser);
 
         // Enviar la nueva contraseña por correo
