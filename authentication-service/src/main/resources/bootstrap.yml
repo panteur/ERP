@@ -11,7 +11,7 @@ spring:
     cache-names:
       - statuses
     caffeine:
-      spec: statuses=expireAfterWrite=1h
+      cache-spec: expireAfterWrite=1h # <-- CORRECCIÓN AQUÍ
 
   ## Spring Security OAuth2
   security:
