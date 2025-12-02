@@ -30,13 +30,18 @@ public class AuthController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<UserDto> getUserWithStatus(@PathVariable String username) {
-        return ResponseEntity.ok(appUserService.findUserWithStatusByUsername(username));
+    public ResponseEntity<UserDto> getUserWithName(@PathVariable String username) {
+        return ResponseEntity.ok(appUserService.findUserByUsername(username));
     }
 
-    @GetMapping("/list")
+    @GetMapping("/users/list")
     public ResponseEntity<List<UserDto>> listAllUsers() {
         return ResponseEntity.ok(appUserService.findAllUsersWithStatus());
+    }
+
+    @GetMapping("/users/by-status/{statusId}")
+    public ResponseEntity<List<UserDto>> listUsersByStatus(@PathVariable Long statusId) {
+        return ResponseEntity.ok(appUserService.findUsersByStatus(statusId));
     }
 
     @PostMapping("/update-password")

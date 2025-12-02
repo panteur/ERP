@@ -20,6 +20,8 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     @Query("select a from AppUser a where a.verificationToken = ?1")
     Optional<AppUser> findByVerificationToken(String token);
 
+    List<AppUser> findByStatusId(Long statusId);
+
     @Query("select a from AppUser a where a.emailVerified = ?1")
     List<AppUser> findByEmailVerified(boolean emailVerified);
 

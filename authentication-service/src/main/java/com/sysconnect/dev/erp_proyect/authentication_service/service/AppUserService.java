@@ -15,15 +15,17 @@ public interface AppUserService {
 
     public MessageDto verifyAccount(String token);
 
-    public UserDto findUserWithStatusByUsername(String username);
+    public UserDto findUserByUsername(String username);
 
     public List<UserDto> findAllUsersWithStatus();
+
+    public List<UserDto> findUsersByStatus(Long statusId);
 
     public AppUser findByRut(String rut);
 
     public AppUser findByEmail(String email);
 
-    public AppUser findByUsername(String username);
+
 
     public AppUser delete(Long id);
 
@@ -34,6 +36,8 @@ public interface AppUserService {
     public MessageDto lockedAccount(String rut);
 
     public MessageDto unLocketAccount(String rut);
+
+
 
     public MessageDto enableAccount(String rut);
 

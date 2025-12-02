@@ -81,7 +81,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public UserDto findUserWithStatusByUsername(String username) {
+    public UserDto findUserByUsername(String username) {
         AppUser appUser = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -120,13 +120,35 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public List<UserDto> findUsersByStatus(Long statusId) {
+        // 1. Llama al cliente Feign UNA SOLA VEZ para obtener el nombre del estado.
+        Status status = statusFeignClient.getStatus(statusId);
+        String statusName = (status != null) ? status.getName() : "Desconocido";
+
+        // 2. Busca en la base de datos todos los usuarios con ese statusId.
+        List<AppUser> users = appUserRepository.findByStatusId(statusId);
+
+        // 3. Convierte la lista de AppUser a una lista de UserDto.
+        return users.stream()
+                .map(appUser -> UserDto.builder()
+                        .username(appUser.getUsername())
+                        .email(appUser.getEmail())
+                        .emailVerified(appUser.isEmailVerified())
+                        .statusName(statusName) // Asigna el nombre del estado (ya lo tenemos)
+                        .expired(appUser.isExpired())
+                        .locked(appUser.isLocked())
+                        .credentialsExpired(appUser.isCredentialsExpired())
+                        .disabled(appUser.isDisabled())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public AppUser findByRut(String rut) {return appUserRepository.findByRut(rut).orElse(null);}
 
     @Override
     public AppUser findByEmail(String email) {return appUserRepository.findByEmail(email).orElse(null);}
 
-    @Override
-    public AppUser findByUsername(String username) {return appUserRepository.findByUsername(username).orElse(null);}
 
     @Override
     public AppUser delete(Long id) {
