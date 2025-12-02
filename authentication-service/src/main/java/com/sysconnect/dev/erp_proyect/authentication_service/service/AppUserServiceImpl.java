@@ -1,9 +1,6 @@
 package com.sysconnect.dev.erp_proyect.authentication_service.service;
 
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.CreateAppUserDto;
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.MessageDto;
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.UpdatePasswordDto;
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.UserDto;
+import com.sysconnect.dev.erp_proyect.authentication_service.dto.*;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.AppUser;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.Role;
 import com.sysconnect.dev.erp_proyect.authentication_service.enums.RoleName;
@@ -149,7 +146,6 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public AppUser findByEmail(String email) {return appUserRepository.findByEmail(email).orElse(null);}
 
-
     @Override
     public AppUser delete(Long id) {
         AppUser appUserDB = appUserRepository.findById(id).orElse(null);
@@ -205,6 +201,7 @@ public class AppUserServiceImpl implements AppUserService {
         }
 
         appUser.setPassword(passwordEncoder.encode(dto.newPassword()));
+        appUser.setPasswordIsNew(false); // La contraseña ya no es nueva
         appUserRepository.save(appUser);
 
         // Enviar correo de notificación
@@ -216,19 +213,21 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public AppUser resetPassword(String rut) {
-        String newPassword = generarCadenaAleatoria(20);
-        AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
-        if (appUserDB == null) return null;
-        appUserDB.setPassword(passwordEncoder.encode((newPassword)));
-        appUserDB.setPasswordIsNew(true);
-        
+    public MessageDto resetPassword(ResetPasswordRequestDto dto) {
+        AppUser appUser = appUserRepository.findByUsernameAndRut(dto.username(), dto.rut())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con el nombre de usuario y RUT proporcionados."));
+
+        String newPassword = generarCadenaAleatoria(8);
+        appUser.setPassword(passwordEncoder.encode(newPassword));
+        appUser.setPasswordIsNew(true); // La contraseña es nueva y debe ser cambiada
+        appUserRepository.save(appUser);
+
         // Enviar la nueva contraseña por correo
         String subject = "Restablecimiento de contraseña";
-        String body = "Hola " + appUserDB.getUsername() + ",\n\nTu nueva contraseña es: " + newPassword;
-        emailService.sendEmail(appUserDB.getEmail(), subject, body);
+        String body = "Hola " + appUser.getUsername() + ",\n\nTu nueva contraseña es: " + newPassword;
+        emailService.sendEmail(appUser.getEmail(), subject, body);
 
-        return appUserDB;
+        return new MessageDto("Se ha enviado una nueva contraseña al correo asociado a la cuenta.");
     }
 
     @Override

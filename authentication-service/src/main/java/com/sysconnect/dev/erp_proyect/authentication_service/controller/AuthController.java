@@ -1,9 +1,6 @@
 package com.sysconnect.dev.erp_proyect.authentication_service.controller;
 
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.CreateAppUserDto;
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.MessageDto;
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.UpdatePasswordDto;
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.UserDto;
+import com.sysconnect.dev.erp_proyect.authentication_service.dto.*;
 import com.sysconnect.dev.erp_proyect.authentication_service.service.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,7 +31,7 @@ public class AuthController {
         return ResponseEntity.ok(appUserService.findUserByUsername(username));
     }
 
-    @GetMapping("/users/list")
+    @GetMapping("/list")
     public ResponseEntity<List<UserDto>> listAllUsers() {
         return ResponseEntity.ok(appUserService.findAllUsersWithStatus());
     }
@@ -47,6 +44,11 @@ public class AuthController {
     @PostMapping("/update-password")
     public ResponseEntity<MessageDto> updatePassword(@RequestBody UpdatePasswordDto dto) {
         return ResponseEntity.ok(appUserService.updatePassword(dto));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<MessageDto> resetPassword(@RequestBody ResetPasswordRequestDto dto) {
+        return ResponseEntity.ok(appUserService.resetPassword(dto));
     }
 
 }

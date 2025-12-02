@@ -5,7 +5,7 @@ import java.util.Random;
 public class GeneradorCadenasAleatorias {
 
     public static String generarCadenaAleatoria(int longitud) {
-        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>/?";
+        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@.-*";
 
         Random random = new Random();
         StringBuilder sb = new StringBuilder();

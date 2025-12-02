@@ -1,9 +1,6 @@
 package com.sysconnect.dev.erp_proyect.authentication_service.service;
 
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.CreateAppUserDto;
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.MessageDto;
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.UpdatePasswordDto;
-import com.sysconnect.dev.erp_proyect.authentication_service.dto.UserDto;
+import com.sysconnect.dev.erp_proyect.authentication_service.dto.*;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.AppUser;
 
 import java.util.Date;
@@ -45,7 +42,7 @@ public interface AppUserService {
 
     public MessageDto updatePassword(UpdatePasswordDto dto);
 
-    public AppUser resetPassword(String rut);
+    public MessageDto resetPassword(ResetPasswordRequestDto dto);
 
     public MessageDto setExpiredPasswordDate(String rut, Date date);
 
