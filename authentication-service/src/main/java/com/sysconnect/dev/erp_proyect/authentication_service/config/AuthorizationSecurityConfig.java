@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -78,7 +79,7 @@ public class AuthorizationSecurityConfig {
             throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/auth/**", "/client/**")
+                        .requestMatchers("/auth/**", "/client/**", "/roles/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
@@ -87,12 +88,7 @@ public class AuthorizationSecurityConfig {
                 .formLogin(Customizer.withDefaults());
 
 
-        http
-                .csrf((csrf) -> csrf
-                        .ignoringRequestMatchers("/auth/**", "/login", "/client/**")
-                );
-
-
+        http.csrf(AbstractHttpConfigurer::disable); // Deshabilitar CSRF para todos los endpoints
 
         return http.build();
     }

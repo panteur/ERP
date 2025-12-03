@@ -18,6 +18,8 @@ public interface AppUserService {
 
     public List<UserDto> findUsersByStatus(Long statusId);
 
+    public MessageDto assignRolesToUser(AssignRolesRequestDto dto);
+
     public AppUser findByRut(String rut);
 
     public AppUser findByEmail(String email);

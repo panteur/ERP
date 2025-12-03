@@ -52,6 +52,7 @@ class AppUserServiceImplTest {
     private AppUser user;
     private Status status;
     private Role userRole;
+    private Role adminRole;
 
     @BeforeEach
     void setUp() {
@@ -77,6 +78,7 @@ class AppUserServiceImplTest {
         status.setDescription("Estado Activo");
 
         userRole = Role.builder().id(1L).role(RoleName.ROLE_USER).build();
+        adminRole = Role.builder().id(2L).role(RoleName.ROLE_ADMIN).build();
     }
 
     @Test
@@ -356,5 +358,42 @@ class AppUserServiceImplTest {
         assertThat(user.getPasswordExpired()).isTrue(); // El campo interno del usuario debería ser true
 
         verify(appUserRepository, times(1)).findByUsername(username);
+    }
+
+    @Test
+    void whenAssignRolesToUser_thenUpdateUserRoles() {
+        // Arrange
+        AssignRolesRequestDto dto = new AssignRolesRequestDto("testuser", List.of("ROLE_ADMIN"));
+        when(appUserRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(roleRepository.findByRole(RoleName.ROLE_ADMIN)).thenReturn(Optional.of(adminRole));
+
+        // Act
+        MessageDto result = appUserService.assignRolesToUser(dto);
+
+        // Assert
+        assertThat(result.message()).isEqualTo("Roles actualizados para el usuario: testuser");
+        assertThat(user.getRoles()).hasSize(1);
+        assertThat(user.getRoles()).contains(adminRole);
+
+        verify(appUserRepository, times(1)).findByUsername("testuser");
+        verify(roleRepository, times(1)).findByRole(RoleName.ROLE_ADMIN);
+        verify(appUserRepository, times(1)).save(user);
+    }
+
+    @Test
+    void whenAssignRolesToUser_withNonExistentRole_thenThrowRuntimeException() {
+        // Arrange
+        AssignRolesRequestDto dto = new AssignRolesRequestDto("testuser", List.of("ROLE_AUDITOR"));
+        when(appUserRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(roleRepository.findByRole(RoleName.ROLE_AUDITOR)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThatThrownBy(() -> appUserService.assignRolesToUser(dto))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Rol no encontrado: ROLE_AUDITOR");
+
+        verify(appUserRepository, times(1)).findByUsername("testuser");
+        verify(roleRepository, times(1)).findByRole(RoleName.ROLE_AUDITOR);
+        verify(appUserRepository, never()).save(any(AppUser.class));
     }
 }

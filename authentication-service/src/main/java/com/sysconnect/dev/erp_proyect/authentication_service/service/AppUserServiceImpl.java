@@ -8,6 +8,7 @@ import com.sysconnect.dev.erp_proyect.authentication_service.feignclients.Status
 import com.sysconnect.dev.erp_proyect.authentication_service.model.Status;
 import com.sysconnect.dev.erp_proyect.authentication_service.repository.AppUserRepository;
 import com.sysconnect.dev.erp_proyect.authentication_service.repository.RoleRepository;
+import com.sysconnect.dev.erp_proyect.authentication_service.utils.GeneradorCadenasAleatorias;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,11 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.sysconnect.dev.erp_proyect.authentication_service.utils.GeneradorCadenasAleatorias.generarCadenaAleatoria;
@@ -161,6 +158,24 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
                         .disabled(appUser.isDisabled())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public MessageDto assignRolesToUser(AssignRolesRequestDto dto) {
+        AppUser appUser = appUserRepository.findByUsername(dto.username())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + dto.username()));
+
+        Set<Role> roles = new HashSet<>();
+        for (String roleName : dto.roleNames()) {
+            Role role = roleRepository.findByRole(RoleName.valueOf(roleName))
+                    .orElseThrow(() -> new RuntimeException("Rol no encontrado: " + roleName));
+            roles.add(role);
+        }
+
+        appUser.setRoles(roles);
+        appUserRepository.save(appUser);
+
+        return new MessageDto("Roles actualizados para el usuario: " + appUser.getUsername());
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.sysconnect.dev.erp_proyect.authentication_service.controller;
 
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.*;
 import com.sysconnect.dev.erp_proyect.authentication_service.service.AppUserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class AuthController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<UserDto> getUserWithName(@PathVariable String username) {
+    public ResponseEntity<UserDto> getUserWithStatus(@PathVariable String username) {
         return ResponseEntity.ok(appUserService.findUserByUsername(username));
     }
 
@@ -41,16 +42,18 @@ public class AuthController {
         return ResponseEntity.ok(appUserService.findUsersByStatus(statusId));
     }
 
-    /* Actualizacion de contraseña */
     @PostMapping("/update-password")
     public ResponseEntity<MessageDto> updatePassword(@RequestBody UpdatePasswordDto dto) {
         return ResponseEntity.ok(appUserService.updatePassword(dto));
     }
 
-    /* resetear contraseña */
     @PostMapping("/reset-password")
     public ResponseEntity<MessageDto> resetPassword(@RequestBody ResetPasswordRequestDto dto) {
         return ResponseEntity.ok(appUserService.resetPassword(dto));
     }
 
+    @PostMapping("/assign-roles")
+    public ResponseEntity<MessageDto> assignRoles(@Valid @RequestBody AssignRolesRequestDto dto) {
+        return ResponseEntity.ok(appUserService.assignRolesToUser(dto));
+    }
 }
