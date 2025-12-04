@@ -5,7 +5,6 @@ import com.sysconnect.dev.erp_proyect.authentication_service.dto.CreateAppUserDt
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.MessageDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.AppUser;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.Role;
-import com.sysconnect.dev.erp_proyect.authentication_service.enums.RoleName;
 import com.sysconnect.dev.erp_proyect.authentication_service.feignclients.StatusFeignClient;
 import com.sysconnect.dev.erp_proyect.authentication_service.repository.AppUserRepository;
 import com.sysconnect.dev.erp_proyect.authentication_service.repository.RoleRepository;
@@ -76,9 +75,9 @@ public class AuthenticationServiceIntegrationTest {
     void setUp() {
         // Asegurarse de que el rol exista en la base de datos de prueba
         // Solo lo creamos si no existe para evitar duplicados si se ejecuta varias veces
-        Optional<Role> existingRole = roleRepository.findByRole(RoleName.ROLE_USER);
+        Optional<Role> existingRole = roleRepository.findByRole("ROLE_USER");
         if (existingRole.isEmpty()) {
-            userRole = Role.builder().id(1L).role(RoleName.ROLE_USER).build();
+            userRole = Role.builder().role("ROLE_USER").build();
             roleRepository.save(userRole);
         } else {
             userRole = existingRole.get();

@@ -42,6 +42,12 @@ public class AppUser implements UserDetails {
     @Column(name = "verification_token", nullable = true)
     private String verificationToken;
 
+    @Column(name = "reset_password_token", nullable = true)
+    private String resetPasswordToken;
+
+    @Column(name = "reset_password_token_exp", nullable = true)
+    private Date resetPasswordTokenExp;
+
     @Column(name = "status_id", nullable = false)
     private Long statusId;
 

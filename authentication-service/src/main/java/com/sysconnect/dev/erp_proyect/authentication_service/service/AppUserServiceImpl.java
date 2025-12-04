@@ -3,7 +3,6 @@ package com.sysconnect.dev.erp_proyect.authentication_service.service;
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.*;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.AppUser;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.Role;
-import com.sysconnect.dev.erp_proyect.authentication_service.enums.RoleName;
 import com.sysconnect.dev.erp_proyect.authentication_service.feignclients.StatusFeignClient;
 import com.sysconnect.dev.erp_proyect.authentication_service.model.Status;
 import com.sysconnect.dev.erp_proyect.authentication_service.repository.AppUserRepository;
@@ -64,8 +63,8 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
         Set<Role> roles = new HashSet<>();
         dto.roles().forEach(r -> {
-            Role role = roleRepository.findByRole(RoleName.valueOf(r))
-                    .orElseThrow(() -> new RuntimeException("Role not found"));
+            Role role = roleRepository.findByRole(r)
+                    .orElseThrow(() -> new RuntimeException("Role not found: " + r));
             roles.add(role);
         });
         appUser.setRoles(roles);
@@ -167,7 +166,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
         Set<Role> roles = new HashSet<>();
         for (String roleName : dto.roleNames()) {
-            Role role = roleRepository.findByRole(RoleName.valueOf(roleName))
+            Role role = roleRepository.findByRole(roleName)
                     .orElseThrow(() -> new RuntimeException("Rol no encontrado: " + roleName));
             roles.add(role);
         }
@@ -176,6 +175,46 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
         appUserRepository.save(appUser);
 
         return new MessageDto("Roles actualizados para el usuario: " + appUser.getUsername());
+    }
+
+    @Override
+    public MessageDto forgotPassword(ForgotPasswordRequestDto dto) {
+        AppUser appUser = appUserRepository.findByEmail(dto.email())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con el email: " + dto.email()));
+
+        String token = UUID.randomUUID().toString();
+        appUser.setResetPasswordToken(token);
+        // Expiración en 15 minutos
+        appUser.setResetPasswordTokenExp(new Date(System.currentTimeMillis() + 900000)); 
+        appUserRepository.save(appUser);
+
+        String resetLink = "http://localhost:4200/reset-password?token=" + token; // URL del frontend
+        String subject = "Solicitud de restablecimiento de contraseña";
+        String body = "Hola " + appUser.getUsername() + ",\n\n"
+                + "Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar:\n"
+                + resetLink + "\n\n"
+                + "Este enlace expirará en 15 minutos.";
+        emailService.sendEmail(appUser.getEmail(), subject, body);
+
+        return new MessageDto("Se ha enviado un enlace de restablecimiento de contraseña a tu correo electrónico.");
+    }
+
+    @Override
+    public MessageDto resetPasswordConfirm(ResetPasswordConfirmDto dto) {
+        AppUser appUser = appUserRepository.findByResetPasswordToken(dto.token())
+                .orElseThrow(() -> new RuntimeException("Token de restablecimiento inválido."));
+
+        if (appUser.getResetPasswordTokenExp().before(new Date())) {
+            throw new RuntimeException("El token de restablecimiento ha expirado.");
+        }
+
+        appUser.setPassword(passwordEncoder.encode(dto.newPassword()));
+        appUser.setPasswordIsNew(false);
+        appUser.setResetPasswordToken(null);
+        appUser.setResetPasswordTokenExp(null);
+        appUserRepository.save(appUser);
+
+        return new MessageDto("Contraseña actualizada exitosamente.");
     }
 
     @Override

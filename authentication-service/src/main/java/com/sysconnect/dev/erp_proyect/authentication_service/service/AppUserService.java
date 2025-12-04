@@ -20,6 +20,10 @@ public interface AppUserService {
 
     public MessageDto assignRolesToUser(AssignRolesRequestDto dto);
 
+    public MessageDto forgotPassword(ForgotPasswordRequestDto dto);
+
+    public MessageDto resetPasswordConfirm(ResetPasswordConfirmDto dto);
+
     public AppUser findByRut(String rut);
 
     public AppUser findByEmail(String email);

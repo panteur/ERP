@@ -1,6 +1,5 @@
 package com.sysconnect.dev.erp_proyect.authentication_service.entity;
 
-import com.sysconnect.dev.erp_proyect.authentication_service.enums.RoleName;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,9 +22,8 @@ public class Role implements GrantedAuthority {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private RoleName role;
+    @Column(name = "role", nullable = false, unique = true, length = 50)
+    private String role;
 
     @Column(name = "description")
     private String description;
@@ -41,6 +39,6 @@ public class Role implements GrantedAuthority {
 
     @Override
     public String getAuthority() {
-        return role.name();
+        return this.role;
     }
 }

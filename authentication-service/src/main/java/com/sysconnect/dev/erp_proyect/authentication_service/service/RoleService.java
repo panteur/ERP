@@ -11,4 +11,5 @@ public interface RoleService {
     MessageDto createRole(CreateRoleDto dto);
     Optional<Role> findByRoleName(String roleName);
     List<Role> findAll();
+    MessageDto deleteRole(Long id);
 }

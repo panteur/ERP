@@ -3,7 +3,6 @@ package com.sysconnect.dev.erp_proyect.authentication_service.service;
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.*;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.AppUser;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.Role;
-import com.sysconnect.dev.erp_proyect.authentication_service.enums.RoleName;
 import com.sysconnect.dev.erp_proyect.authentication_service.feignclients.StatusFeignClient;
 import com.sysconnect.dev.erp_proyect.authentication_service.model.Status;
 import com.sysconnect.dev.erp_proyect.authentication_service.repository.AppUserRepository;
@@ -77,8 +76,8 @@ class AppUserServiceImplTest {
         status.setCodint("ACT");
         status.setDescription("Estado Activo");
 
-        userRole = Role.builder().id(1L).role(RoleName.ROLE_USER).build();
-        adminRole = Role.builder().id(2L).role(RoleName.ROLE_ADMIN).build();
+        userRole = Role.builder().id(1L).role("ROLE_USER").build();
+        adminRole = Role.builder().id(2L).role("ROLE_ADMIN").build();
     }
 
     @Test
@@ -117,7 +116,7 @@ class AppUserServiceImplTest {
                 "newuser", "rawPassword", "newuser@example.com", List.of("ROLE_USER") // CORRECCIÓN: Usar List.of
         );
         when(passwordEncoder.encode(dto.password())).thenReturn("encodedNewPassword");
-        when(roleRepository.findByRole(RoleName.ROLE_USER)).thenReturn(Optional.of(userRole));
+        when(roleRepository.findByRole("ROLE_USER")).thenReturn(Optional.of(userRole));
         when(appUserRepository.save(any(AppUser.class))).thenAnswer(invocation -> invocation.getArgument(0)); // Devuelve el mismo objeto guardado
 
         MessageDto result = appUserService.createUser(dto);
@@ -125,7 +124,7 @@ class AppUserServiceImplTest {
         assertThat(result.message()).contains("guardado. Se ha enviado un correo de verificación.");
 
         verify(passwordEncoder, times(1)).encode(dto.password());
-        verify(roleRepository, times(1)).findByRole(RoleName.ROLE_USER);
+        verify(roleRepository, times(1)).findByRole("ROLE_USER");
         verify(appUserRepository, times(1)).save(any(AppUser.class));
         verify(emailService, times(1)).sendEmail(eq(dto.email()), eq("Verifica tu cuenta"), anyString());
     }
@@ -136,11 +135,11 @@ class AppUserServiceImplTest {
                 "newuser", "rawPassword", "newuser@example.com", List.of("ROLE_ADMIN") // CORRECCIÓN: Usar List.of
         );
         when(passwordEncoder.encode(dto.password())).thenReturn("encodedNewPassword"); // Mockear la llamada esperada
-        when(roleRepository.findByRole(RoleName.ROLE_ADMIN)).thenReturn(Optional.empty());
+        when(roleRepository.findByRole("ROLE_ADMIN")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> appUserService.createUser(dto))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Role not found");
+                .hasMessage("Role not found: ROLE_ADMIN");
 
         verify(passwordEncoder, times(1)).encode(dto.password()); // Verificar que sí se llamó
         verifyNoInteractions(appUserRepository, emailService); // Verificar que estos no se llamaron
@@ -365,7 +364,7 @@ class AppUserServiceImplTest {
         // Arrange
         AssignRolesRequestDto dto = new AssignRolesRequestDto("testuser", List.of("ROLE_ADMIN"));
         when(appUserRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
-        when(roleRepository.findByRole(RoleName.ROLE_ADMIN)).thenReturn(Optional.of(adminRole));
+        when(roleRepository.findByRole("ROLE_ADMIN")).thenReturn(Optional.of(adminRole));
 
         // Act
         MessageDto result = appUserService.assignRolesToUser(dto);
@@ -376,24 +375,25 @@ class AppUserServiceImplTest {
         assertThat(user.getRoles()).contains(adminRole);
 
         verify(appUserRepository, times(1)).findByUsername("testuser");
-        verify(roleRepository, times(1)).findByRole(RoleName.ROLE_ADMIN);
+        verify(roleRepository, times(1)).findByRole("ROLE_ADMIN");
         verify(appUserRepository, times(1)).save(user);
     }
 
     @Test
     void whenAssignRolesToUser_withNonExistentRole_thenThrowRuntimeException() {
         // Arrange
-        AssignRolesRequestDto dto = new AssignRolesRequestDto("testuser", List.of("ROLE_AUDITOR"));
+        String nonExistentRole = "ROLE_AUDITOR";
+        AssignRolesRequestDto dto = new AssignRolesRequestDto("testuser", List.of(nonExistentRole));
         when(appUserRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
-        when(roleRepository.findByRole(RoleName.ROLE_AUDITOR)).thenReturn(Optional.empty());
+        when(roleRepository.findByRole(nonExistentRole)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThatThrownBy(() -> appUserService.assignRolesToUser(dto))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Rol no encontrado: ROLE_AUDITOR");
+                .hasMessage("Rol no encontrado: " + nonExistentRole);
 
         verify(appUserRepository, times(1)).findByUsername("testuser");
-        verify(roleRepository, times(1)).findByRole(RoleName.ROLE_AUDITOR);
+        verify(roleRepository, times(1)).findByRole(nonExistentRole);
         verify(appUserRepository, never()).save(any(AppUser.class));
     }
 }

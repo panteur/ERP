@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -18,7 +16,7 @@ public class AuthController {
     private final AppUserService appUserService;
 
     @PostMapping("/create")
-    public ResponseEntity<MessageDto> createUser(@RequestBody CreateAppUserDto dto) {
+    public ResponseEntity<MessageDto> createUser(@Valid @RequestBody CreateAppUserDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(appUserService.createUser(dto));
     }
 
@@ -27,33 +25,23 @@ public class AuthController {
         return ResponseEntity.ok(appUserService.verifyAccount(token));
     }
 
-    @GetMapping("/user/{username}")
-    public ResponseEntity<UserDto> getUserWithStatus(@PathVariable String username) {
-        return ResponseEntity.ok(appUserService.findUserByUsername(username));
-    }
-
-    @GetMapping("/list")
-    public ResponseEntity<List<UserDto>> listAllUsers() {
-        return ResponseEntity.ok(appUserService.findAllUsersWithStatus());
-    }
-
-    @GetMapping("/users/by-status/{statusId}")
-    public ResponseEntity<List<UserDto>> listUsersByStatus(@PathVariable Long statusId) {
-        return ResponseEntity.ok(appUserService.findUsersByStatus(statusId));
-    }
-
     @PostMapping("/update-password")
-    public ResponseEntity<MessageDto> updatePassword(@RequestBody UpdatePasswordDto dto) {
+    public ResponseEntity<MessageDto> updatePassword(@Valid @RequestBody UpdatePasswordDto dto) {
         return ResponseEntity.ok(appUserService.updatePassword(dto));
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<MessageDto> resetPassword(@RequestBody ResetPasswordRequestDto dto) {
+    public ResponseEntity<MessageDto> resetPassword(@Valid @RequestBody ResetPasswordRequestDto dto) {
         return ResponseEntity.ok(appUserService.resetPassword(dto));
     }
 
-    @PostMapping("/assign-roles")
-    public ResponseEntity<MessageDto> assignRoles(@Valid @RequestBody AssignRolesRequestDto dto) {
-        return ResponseEntity.ok(appUserService.assignRolesToUser(dto));
+    @PostMapping("/forgot-password")
+    public ResponseEntity<MessageDto> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto dto) {
+        return ResponseEntity.ok(appUserService.forgotPassword(dto));
+    }
+
+    @PostMapping("/reset-password-confirm")
+    public ResponseEntity<MessageDto> resetPasswordConfirm(@Valid @RequestBody ResetPasswordConfirmDto dto) {
+        return ResponseEntity.ok(appUserService.resetPasswordConfirm(dto));
     }
 }

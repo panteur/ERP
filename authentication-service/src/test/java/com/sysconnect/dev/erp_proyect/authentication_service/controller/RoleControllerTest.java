@@ -5,7 +5,6 @@ import com.sysconnect.dev.erp_proyect.authentication_service.config.Authorizatio
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.CreateRoleDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.dto.MessageDto;
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.Role;
-import com.sysconnect.dev.erp_proyect.authentication_service.enums.RoleName;
 import com.sysconnect.dev.erp_proyect.authentication_service.service.ClientService;
 import com.sysconnect.dev.erp_proyect.authentication_service.service.RoleService;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf; // Importar csrf()
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user; // Importar user()
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -86,8 +84,8 @@ public class RoleControllerTest {
     @Test
     void whenGetAllRoles_thenReturnListOfRoles() throws Exception {
         // Arrange
-        Role role1 = Role.builder().id(1L).role(RoleName.ROLE_ADMIN).description("Admin").build();
-        Role role2 = Role.builder().id(2L).role(RoleName.ROLE_USER).description("User").build();
+        Role role1 = Role.builder().id(1L).role("ROLE_ADMIN").description("Admin").build();
+        Role role2 = Role.builder().id(2L).role("ROLE_USER").description("User").build();
         List<Role> roles = List.of(role1, role2);
 
         when(roleService.findAll()).thenReturn(roles);
@@ -98,5 +96,21 @@ public class RoleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(roles)));
+    }
+
+    @Test
+    void whenDeleteRole_withAdminUser_thenReturnOk() throws Exception {
+        // Arrange
+        Long roleId = 1L;
+        MessageDto messageDto = new MessageDto("Role 'ROLE_ADMIN' deleted successfully.");
+
+        when(roleService.deleteRole(roleId)).thenReturn(messageDto);
+
+        // Act & Assert
+        mockMvc.perform(delete("/roles/{id}", roleId)
+                        .with(user("admin").roles("ADMIN")) // Simula un usuario con rol ADMIN
+                        .with(csrf())) // Añade el token CSRF
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(messageDto)));
     }
 }

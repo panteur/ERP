@@ -1,6 +1,7 @@
 package com.sysconnect.dev.erp_proyect.authentication_service.repository;
 
 import com.sysconnect.dev.erp_proyect.authentication_service.entity.AppUser;
+import com.sysconnect.dev.erp_proyect.authentication_service.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,10 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
     @Query("select a from AppUser a where a.verificationToken = ?1")
     Optional<AppUser> findByVerificationToken(String token);
+
+    Optional<AppUser> findByResetPasswordToken(String token);
+
+    long countByRolesContains(Role role);
 
     List<AppUser> findByStatusId(Long statusId);
 
