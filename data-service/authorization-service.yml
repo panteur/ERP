@@ -5,6 +5,15 @@ auth:
   server:
     issuer-uri:  http://localhost:9000
 
+
+## Java Key Store
+keystore:
+  path: keystore.jks # O la ruta relativa/absoluta donde hayas colocado el archivo
+  password: changeit # La contraseña que elegiste para el keystore
+
+key:
+  alias: jwtkey # El alias que usaste al generar la clave
+
 spring:
 
   ## Base de datos

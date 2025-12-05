@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,8 +28,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Set;
@@ -42,6 +42,16 @@ public class AuthorizationSecurityConfig {
 
     @Value("${auth.server.issuer-uri}")
     private String issuerUri;
+
+    @Value("${keystore.path}")
+    private String keystorePath;
+
+    @Value("${keystore.password}")
+    private String keystorePassword;
+
+    @Value("${key.alias}")
+    private String keyAlias;
+
 
     @Bean
     @Order(1)
@@ -97,27 +107,18 @@ public class AuthorizationSecurityConfig {
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
-        KeyPair keyPair = generateKeyPair();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        RSAKey rsaKey = new RSAKey.Builder(publicKey)
-                .privateKey(privateKey)
-                .keyID(UUID.randomUUID().toString())
-                .build();
-        JWKSet jwkSet = new JWKSet(rsaKey);
-        return new ImmutableJWKSet<>(jwkSet);
-    }
-
-    private static KeyPair generateKeyPair() {
-        KeyPair keyPair;
         try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(2048);
-            keyPair = generator.generateKeyPair();
+            var keystore = KeyStore.getInstance("jks");
+            var resource = new ClassPathResource(keystorePath);
+            keystore.load(resource.getInputStream(), keystorePassword.toCharArray());
+
+            RSAKey rsaKey = RSAKey.load(keystore, keyAlias, keystorePassword.toCharArray());
+            JWKSet jwkSet = new JWKSet(rsaKey);
+            return new ImmutableJWKSet<>(jwkSet);
         } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
+            log.error("Error loading keystore, please check the configuration. Details: {}", ex.getMessage());
+            throw new RuntimeException("Failed to load keystore for JWT signing", ex);
         }
-        return keyPair;
     }
 
     @Bean
