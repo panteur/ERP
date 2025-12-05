@@ -20,8 +20,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf; // Importar csrf()
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user; // Importar user()
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,7 +47,7 @@ public class RoleControllerTest {
     private ClientService clientService;
 
     @Test
-    void whenCreateRole_withValidDataAndAdminUser_thenReturnCreated() throws Exception {
+    void whenCreateRole_withValidData_thenReturnCreated() throws Exception {
         // Arrange
         CreateRoleDto createDto = new CreateRoleDto("ROLE_TEST", "Test Role Description");
         MessageDto messageDto = new MessageDto("Role ROLE_TEST created successfully.");
@@ -57,9 +55,7 @@ public class RoleControllerTest {
         when(roleService.createRole(any(CreateRoleDto.class))).thenReturn(messageDto);
 
         // Act & Assert
-        mockMvc.perform(post("/roles")
-                        .with(user("admin").roles("ADMIN")) // Simula un usuario con rol ADMIN
-                        .with(csrf()) // Añade el token CSRF
+        mockMvc.perform(post("/roles/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isCreated())
@@ -73,9 +69,7 @@ public class RoleControllerTest {
         // No mockeamos el servicio porque la validación @NotBlank debería fallar antes
 
         // Act & Assert
-        mockMvc.perform(post("/roles")
-                        .with(user("admin").roles("ADMIN")) // También necesita un usuario autenticado para pasar el filtro de seguridad
-                        .with(csrf()) // Añade el token CSRF
+        mockMvc.perform(post("/roles/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isBadRequest()); // Esperamos 400 Bad Request
@@ -91,15 +85,14 @@ public class RoleControllerTest {
         when(roleService.findAll()).thenReturn(roles);
 
         // Act & Assert
-        mockMvc.perform(get("/roles")
-                        .with(user("admin").roles("ADMIN")) // También necesita un usuario autenticado
+        mockMvc.perform(get("/roles/list")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(roles)));
     }
 
     @Test
-    void whenDeleteRole_withAdminUser_thenReturnOk() throws Exception {
+    void whenDeleteRole_thenReturnOk() throws Exception {
         // Arrange
         Long roleId = 1L;
         MessageDto messageDto = new MessageDto("Role 'ROLE_ADMIN' deleted successfully.");
@@ -107,9 +100,7 @@ public class RoleControllerTest {
         when(roleService.deleteRole(roleId)).thenReturn(messageDto);
 
         // Act & Assert
-        mockMvc.perform(delete("/roles/{id}", roleId)
-                        .with(user("admin").roles("ADMIN")) // Simula un usuario con rol ADMIN
-                        .with(csrf())) // Añade el token CSRF
+        mockMvc.perform(delete("/roles/{id}", roleId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(messageDto)));
     }

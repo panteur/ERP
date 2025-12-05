@@ -1,6 +1,10 @@
 server:
   port: 9000
 
+auth:
+  server:
+    issuer-uri:  http://localhost:9000
+
 spring:
 
   ## Base de datos

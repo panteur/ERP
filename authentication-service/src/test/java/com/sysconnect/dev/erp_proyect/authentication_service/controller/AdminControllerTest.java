@@ -19,8 +19,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,8 +52,6 @@ public class AdminControllerTest {
         when(appUserService.assignRolesToUser(any(AssignRolesRequestDto.class))).thenReturn(messageDto);
 
         mockMvc.perform(post("/admin/users/assign-roles")
-                        .with(user("admin").roles("ADMIN"))
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(assignDto)))
                 .andExpect(status().isOk())

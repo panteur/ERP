@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,8 +50,7 @@ public class UserControllerTest {
 
         when(appUserService.findUserByUsername(eq(username))).thenReturn(userDto);
 
-        mockMvc.perform(get("/users/{username}", username)
-                        .with(user("admin").roles("ADMIN")))
+        mockMvc.perform(get("/users/{username}", username))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(userDto)));
     }
@@ -65,8 +63,7 @@ public class UserControllerTest {
 
         when(appUserService.findAllUsersWithStatus()).thenReturn(userDtoList);
 
-        mockMvc.perform(get("/users")
-                        .with(user("admin").roles("ADMIN")))
+        mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(userDtoList)));
     }
@@ -79,8 +76,7 @@ public class UserControllerTest {
 
         when(appUserService.findUsersByStatus(eq(statusId))).thenReturn(userDtoList);
 
-        mockMvc.perform(get("/users/by-status/{statusId}", statusId)
-                        .with(user("admin").roles("ADMIN")))
+        mockMvc.perform(get("/users/by-status/{statusId}", statusId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(userDtoList)));
     }
