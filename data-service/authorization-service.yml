@@ -9,7 +9,7 @@ auth:
 ## Java Key Store
 keystore:
   path: keystore.jks # O la ruta relativa/absoluta donde hayas colocado el archivo
-  password: '@@@Mul7899968@@@' # La contraseña que elegiste para el keystore
+  password: Mul7899968@@@ # La contraseña que elegiste para el keystore
 
 key:
   alias: jwtkey # El alias que usaste al generar la clave
