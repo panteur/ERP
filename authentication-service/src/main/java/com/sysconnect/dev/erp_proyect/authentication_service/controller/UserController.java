@@ -16,7 +16,7 @@ public class UserController {
     private final AppUserService appUserService;
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserDto> getUserWithStatus(@PathVariable String username) {
+    public ResponseEntity<UserDto> getUserByUserName(@PathVariable String username) {
         return ResponseEntity.ok(appUserService.findUserByUsername(username));
     }
 
