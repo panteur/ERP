@@ -25,59 +25,7 @@ app:
       enabled: false
 
 # Resilience4j Circuit Breaker configuration
-resilience4j:
-  circuitbreaker:
-    instances:
-      status:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-      criticity:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-      tax:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-      brands:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-      region:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-      commune:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-      currency:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-      measurement-unit:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-      measurement-unit-type:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
-      status-type:
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        register-health-indicator: true
+
 
 
 #  security:
