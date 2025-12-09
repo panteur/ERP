@@ -9,6 +9,7 @@ import com.sysconnect.dev.erp_proyect.entity_service.enums.Sex;
 import com.sysconnect.dev.erp_proyect.entity_service.feignclients.StatusFeignClient;
 import com.sysconnect.dev.erp_proyect.entity_service.repository.CustomerRepository;
 import com.sysconnect.dev.erp_proyect.entity_service.repository.EntitieRepository;
+import com.sysconnect.dev.erp_proyect.entity_service.utils.CapitalizeWords;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private StatusFeignClient feignClient;
+
+    private CapitalizeWords capitalizeWords;
 
 
     @Override
@@ -66,8 +69,8 @@ public class CustomerServiceImpl implements CustomerService {
                     .build());
         }
         Customer customerDB = new Customer();
-        customerDB.setNames(dto.getNames());
-        customerDB.setLastNames(dto.getLastNames());
+        customerDB.setNames(capitalizeWords.capitalize(dto.getNames()));
+        customerDB.setLastNames(capitalizeWords.capitalize(dto.getLastNames()));
         customerDB.setBirthDate(dto.getBirthDate());
         customerDB.setSex(dto.getSex());
         customerDB.setStatus(feignClient.getStatusByCodint("STS_CLIENTE_VIGENTE").getBody());
@@ -80,8 +83,8 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer update(Customer customer) {
         Customer customerDB = customerRepository.findById(customer.getId()).orElse(null);
         if (customerDB == null) return null;
-        customerDB.setNames(customer.getNames());
-        customerDB.setLastNames(customer.getLastNames());
+        customerDB.setNames(capitalizeWords.capitalize(customer.getNames()));
+        customerDB.setLastNames(capitalizeWords.capitalize(customer.getLastNames()));
         customerDB.setStatusId(customer.getStatusId());
         customerDB.setBirthDate(customer.getBirthDate());
         customerDB.setSex(customer.getSex());

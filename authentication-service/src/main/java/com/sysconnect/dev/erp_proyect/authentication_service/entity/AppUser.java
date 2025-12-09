@@ -85,9 +85,6 @@ public class AppUser implements UserDetails {
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
 
-    @Column(name = "rut")
-    private String rut;
-
     @Column(name = "password_is_new")
     private Boolean passwordIsNew = true;
 

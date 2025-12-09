@@ -33,7 +33,6 @@ public class AppUserRepositoryTest {
                 .username("testuser1")
                 .password("password")
                 .email("test1@example.com")
-                .rut("11111111-1")
                 .statusId(1L)
                 .verificationToken(UUID.randomUUID().toString())
                 .disabled(false)
@@ -43,7 +42,6 @@ public class AppUserRepositoryTest {
                 .username("testuser2")
                 .password("password")
                 .email("test2@example.com")
-                .rut("22222222-2")
                 .statusId(2L)
                 .disabled(true)
                 .build();
@@ -80,12 +78,6 @@ public class AppUserRepositoryTest {
         assertThat(foundUsers.get(0).getUsername()).isEqualTo("testuser1");
     }
 
-    @Test
-    void whenFindByRut_thenReturnAppUser() {
-        Optional<AppUser> foundUser = appUserRepository.findByRut("11111111-1");
-        assertThat(foundUser).isPresent();
-        assertThat(foundUser.get().getRut()).isEqualTo("11111111-1");
-    }
 
     @Test
     void whenFindByDisabled_thenReturnUserList() {
@@ -96,14 +88,6 @@ public class AppUserRepositoryTest {
         List<AppUser> enabledUsers = appUserRepository.findByDisabled(false);
         assertThat(enabledUsers).hasSize(1);
         assertThat(enabledUsers.get(0).getUsername()).isEqualTo("testuser1");
-    }
-
-    @Test
-    void whenFindByUsernameAndRut_thenReturnAppUser() {
-        Optional<AppUser> foundUser = appUserRepository.findByUsernameAndRut("testuser1", "11111111-1");
-        assertThat(foundUser).isPresent();
-        assertThat(foundUser.get().getUsername()).isEqualTo(user1.getUsername());
-        assertThat(foundUser.get().getRut()).isEqualTo(user1.getRut());
     }
 
     @Test

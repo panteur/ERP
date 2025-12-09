@@ -24,8 +24,6 @@ public interface AppUserService {
 
     public MessageDto resetPasswordConfirm(ResetPasswordConfirmDto dto);
 
-    public AppUser findByRut(String rut);
-
     public AppUser findByEmail(String email);
 
 

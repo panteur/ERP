@@ -60,7 +60,6 @@ class AppUserServiceImplTest {
                 .username("testuser")
                 .password("encodedPassword")
                 .email("test@example.com")
-                .rut("12345678-9")
                 .statusId(1L) // El ID del estado que usaremos para buscar
                 .emailVerified(true)
                 .passwordIsNew(false)
@@ -90,7 +89,6 @@ class AppUserServiceImplTest {
 
         assertThat(resultDto).isNotNull();
         assertThat(resultDto.getUsername()).isEqualTo("testuser");
-        assertThat(resultDto.getRut()).isEqualTo("12345678-9");
         assertThat(resultDto.getStatusName()).isEqualTo("Activo");
 
         verify(appUserRepository, times(1)).findByUsername(username);

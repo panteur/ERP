@@ -36,9 +36,6 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
     List<AppUser> findByLocked(boolean locked);
 
-    @Query("select a from AppUser a where a.rut = ?1")
-    Optional<AppUser> findByRut(String rut);
-
     @Query("select a from AppUser a where a.passwordIsNew = ?1")
     List<AppUser> findByPasswordIsNew(Boolean passwordIsNew);
 

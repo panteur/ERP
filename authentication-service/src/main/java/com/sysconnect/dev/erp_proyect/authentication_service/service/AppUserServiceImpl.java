@@ -103,7 +103,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
         return UserDto.builder()
                 .username(appUser.getUsername())
                 .email(appUser.getEmail())
-                .rut(appUser.getRut())
+
                 .emailVerified(appUser.isEmailVerified())
                 .statusName(status.getName()) // Asumiendo que el objeto Status tiene un método getName()
                 .expired(appUser.isExpired())
@@ -122,7 +122,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
                     return UserDto.builder()
                             .username(appUser.getUsername())
                             .email(appUser.getEmail())
-                            .rut(appUser.getRut())
+
                             .emailVerified(appUser.isEmailVerified())
                             .statusName(status.getName())
                             .expired(appUser.isExpired())
@@ -148,7 +148,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
                 .map(appUser -> UserDto.builder()
                         .username(appUser.getUsername())
                         .email(appUser.getEmail())
-                        .rut(appUser.getRut())
+
                         .emailVerified(appUser.isEmailVerified())
                         .statusName(statusName) // Asigna el nombre del estado (ya lo tenemos)
                         .expired(appUser.isExpired())
@@ -217,8 +217,6 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
         return new MessageDto("Contraseña actualizada exitosamente.");
     }
 
-    @Override
-    public AppUser findByRut(String rut) {return appUserRepository.findByRut(rut).orElse(null);}
 
     @Override
     public AppUser findByEmail(String email) {return appUserRepository.findByEmail(email).orElse(null);}
@@ -233,8 +231,8 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public MessageDto disabledAccount(String rut) {
-        AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
+    public MessageDto disabledAccount(String username) {
+        AppUser appUserDB = appUserRepository.findByUsername(username).orElse(null);
         if (appUserDB == null) return null;
         if(appUserDB.isDisabled()) return null;
         appUserDB.setDisabled(true);
@@ -242,8 +240,8 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public MessageDto lockedAccount(String rut) {
-        AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
+    public MessageDto lockedAccount(String username) {
+        AppUser appUserDB = appUserRepository.findByUsername(username).orElse(null);
         if (appUserDB == null) return null;
         if( appUserDB.isLocked()) return null;
         appUserDB.setLocked(true);
@@ -251,8 +249,8 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public MessageDto unLocketAccount(String rut) {
-        AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
+    public MessageDto unLocketAccount(String username) {
+        AppUser appUserDB = appUserRepository.findByUsername(username).orElse(null);
         if (appUserDB == null) return null;
         if( !appUserDB.isLocked()) return null;
         appUserDB.setLocked(false);
@@ -260,8 +258,8 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public MessageDto enableAccount(String rut) {
-        AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
+    public MessageDto enableAccount(String username) {
+        AppUser appUserDB = appUserRepository.findByUsername(username).orElse(null);
         if (appUserDB == null) return null;
         if( !appUserDB.isDisabled()) return null;
         appUserDB.setDisabled(false);
@@ -316,8 +314,8 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public MessageDto setExpiredPasswordDate(String rut, Date date) {
-        AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
+    public MessageDto setExpiredPasswordDate(String username, Date date) {
+        AppUser appUserDB = appUserRepository.findByUsername(username).orElse(null);
         if (appUserDB == null) return null;
         appUserDB.setPasswordExpDate(date);
         if (!appUserDB.getPasswordExpired()){
@@ -327,16 +325,16 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
     }
 
     @Override
-    public MessageDto clearPasswordExpired(String rut) {
-        AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
+    public MessageDto clearPasswordExpired(String username) {
+        AppUser appUserDB = appUserRepository.findByUsername(username).orElse(null);
         if (appUserDB == null) return null;
         appUserDB.setExpired(false);
         return new MessageDto("user " + appUserDB.getUsername() + " Contraseña actualizada");
     }
 
     @Override
-    public MessageDto emailUpdate(String rut, String email) {
-        AppUser appUserDB = appUserRepository.findByRut(rut).orElse(null);
+    public MessageDto emailUpdate(String username, String email) {
+        AppUser appUserDB = appUserRepository.findByUsername(username).orElse(null);
         if (appUserDB == null) return null;
         appUserDB.setEmail(email);
         return new MessageDto("user " + appUserDB.getUsername() + " Email actualizado");
