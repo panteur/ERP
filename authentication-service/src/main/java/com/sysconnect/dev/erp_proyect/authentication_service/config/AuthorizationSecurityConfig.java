@@ -43,6 +43,9 @@ public class AuthorizationSecurityConfig {
     @Value("${auth.server.issuer-uri}")
     private String issuerUri;
 
+    private static final String[] SWAGGER_PATHS = {"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"};
+
+
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -67,7 +70,9 @@ public class AuthorizationSecurityConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(SWAGGER_PATHS).permitAll()
                         .requestMatchers("/auth/**", "/client/**", "/roles/**", "/users/**", "/admin/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()  /* Entity service Customer */
                         .anyRequest().authenticated()
                 )
                 .formLogin(Customizer.withDefaults());

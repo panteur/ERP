@@ -22,6 +22,7 @@ public class ResourceServerConfig {
         return http
                 .authorizeRequests(auth ->
                         auth
+                                .requestMatchers("/api/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2ResourceServer ->

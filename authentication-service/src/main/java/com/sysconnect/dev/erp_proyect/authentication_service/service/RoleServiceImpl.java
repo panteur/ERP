@@ -28,7 +28,7 @@ public class RoleServiceImpl implements RoleService {
 
         // 2. Verificar que el rol no exista ya en la base de datos
         if (roleRepository.findByRole(normalizedRoleName).isPresent()) {
-            throw new RuntimeException("Role " + normalizedRoleName + " already exists.");
+            throw new RuntimeException("El rol " + normalizedRoleName + " ya existe.");
         }
 
         // 3. Crear y guardar el nuevo rol
@@ -38,7 +38,7 @@ public class RoleServiceImpl implements RoleService {
                 .build();
         roleRepository.save(newRole);
 
-        return new MessageDto("Role " + newRole.getRole() + " created successfully.");
+        return new MessageDto("Rol " + newRole.getRole() + " creado exitosamente.");
     }
 
     @Override
@@ -55,17 +55,17 @@ public class RoleServiceImpl implements RoleService {
     public MessageDto deleteRole(Long id) {
         // 1. Buscar el rol
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Role not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado con id: " + id));
 
         // 2. Verificar si el rol está en uso
         long userCount = appUserRepository.countByRolesContains(role);
         if (userCount > 0) {
-            throw new RuntimeException("Cannot delete role '" + role.getRole() + "' because it is currently assigned to " + userCount + " user(s).");
+            throw new RuntimeException("No se puede eliminar el rol '" + role.getRole() + "' porque está asignado a " + userCount + " usuario(s).");
         }
 
         // 3. Eliminar el rol
         roleRepository.delete(role);
 
-        return new MessageDto("Role '" + role.getRole() + "' deleted successfully.");
+        return new MessageDto("Rol '" + role.getRole() + "' eliminado exitosamente.");
     }
 }

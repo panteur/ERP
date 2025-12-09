@@ -1,7 +1,5 @@
 package com.sysconnect.dev.erp_proyect.entity_service.dto;
 
-import com.sysconnect.dev.erp_proyect.entity_service.enums.ContractType;
-import com.sysconnect.dev.erp_proyect.entity_service.enums.Nationality;
 import com.sysconnect.dev.erp_proyect.entity_service.enums.Sex;
 import com.sysconnect.dev.erp_proyect.entity_service.model.Status;
 import lombok.*;
@@ -27,12 +25,6 @@ public class EmployeeDto {
     private Date birthDate;
 
     private Sex sex;
-
-    private Nationality nationality;
-
-    private ContractType contractType;
-
-    private Date endContract;
 
     private Long statusId;
 

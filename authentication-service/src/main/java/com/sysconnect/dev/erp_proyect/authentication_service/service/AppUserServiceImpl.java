@@ -292,7 +292,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
         String body = "Hola " + appUser.getUsername() + ",\n\nTu contraseña ha sido actualizada exitosamente. Si no has sido tú, por favor, contacta con nosotros.";
         emailService.sendEmail(appUser.getEmail(), subject, body);
 
-        return new MessageDto("Password updated successfully for user: " + appUser.getUsername());
+        return new MessageDto("Contraseña actualizada con éxito para el usuario: " + appUser.getUsername());
     }
 
     @Override

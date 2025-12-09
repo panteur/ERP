@@ -1,6 +1,7 @@
 package com.sysconnect.dev.erp_proyect.entity_service.entity;
 
-import com.sysconnect.dev.erp_proyect.entity_service.enums.ContractType;
+import com.sysconnect.dev.erp_proyect.entity_service.enums.CivilState;
+import com.sysconnect.dev.erp_proyect.entity_service.enums.Sex;
 import com.sysconnect.dev.erp_proyect.entity_service.model.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,13 +26,11 @@ public class Employee {
     @JoinColumn(name = "entitie_id", nullable = false, unique = true)
     private Entitie entitie;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "contract_type", nullable = false)
-    private ContractType contractType;
+    @Column(name = "names", nullable = false)
+    private String names;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "end_contract")
-    private Date endContract;
+    @Column(name = "last_names", nullable = false)
+    private String lastNames;
 
     //Status from master-data-service
     @Column(name = "status_id", nullable = false)
@@ -39,6 +38,21 @@ public class Employee {
 
     @Transient
     private Status status;
+
+    @Column(name = "birth_date")
+    private Date birthDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sex", nullable = false)
+    private Sex sex;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "civil_state", nullable = false)
+    private CivilState civilState;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "entry_date")
+    private Date entryDate;
 
 
 }

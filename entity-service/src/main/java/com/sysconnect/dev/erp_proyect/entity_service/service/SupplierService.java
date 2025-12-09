@@ -10,9 +10,7 @@ public interface SupplierService {
     public Supplier findByEntitie_Id(Long id);
     public List<Supplier> findAll();
     public List<Supplier> findByStatusId(Long statusId);
-    public List<Supplier> findByPayDay(int payDay);
     public Supplier updateStatus(Long id, Long statusId);
-    public Supplier updatePayInformation(Long id, int payDay, String medioPago, String formaPago);
 
     public Supplier save(Supplier supplier);
     public Supplier update(Supplier supplier);

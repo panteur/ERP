@@ -1,6 +1,6 @@
 package com.sysconnect.dev.erp_proyect.entity_service.entity;
 
-import com.sysconnect.dev.erp_proyect.entity_service.enums.EmailStatus;
+import com.sysconnect.dev.erp_proyect.entity_service.enums.Sex;
 import com.sysconnect.dev.erp_proyect.entity_service.model.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,25 +25,31 @@ public class Customer {
     @JoinColumn(name = "entitie_id", nullable = false, unique = true)
     private Entitie entitie;
 
+    @Column(name = "names", nullable = false)
+    private String names;
+
+    @Column(name = "last_names", nullable = false)
+    private String lastNames;
+
     @Column(name = "status_id", nullable = false)
     private Long statusId;
 
     @Transient
     private Status status;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "parent_id")
-    private Entitie parent;
+    @Column(name = "birth_date")
+    private Date birthDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sex", nullable = false)
+    private Sex sex;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "first_purchase")
+    private Date firstPurchase;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "last_purchase")
     private Date lastPurchase;
-
-    @Column(name = "email", nullable = false, length = 150)
-    private String email;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "email_status", nullable = false)
-    private EmailStatus emailStatus = EmailStatus.REGISTRADO;
 
 }

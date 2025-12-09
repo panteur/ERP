@@ -9,9 +9,11 @@ import com.sysconnect.dev.erp_proyect.master_data_service.preload_data_STATUS.*;
 import com.sysconnect.dev.erp_proyect.master_data_service.preload_data_TAX.LoadTax;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnProperty(name = "app.preload.data.enabled", havingValue = "true")
 public class PreLoadMasterDataImpl {
 
 

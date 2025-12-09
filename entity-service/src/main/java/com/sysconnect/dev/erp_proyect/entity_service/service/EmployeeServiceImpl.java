@@ -1,7 +1,6 @@
 package com.sysconnect.dev.erp_proyect.entity_service.service;
 
 import com.sysconnect.dev.erp_proyect.entity_service.entity.Employee;
-import com.sysconnect.dev.erp_proyect.entity_service.enums.ContractType;
 import com.sysconnect.dev.erp_proyect.entity_service.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,9 +25,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<Employee> findByStatusId(Long statusId) {return employeeRepository.findByStatusId(statusId);}
 
     @Override
-    public List<Employee> findByEndContractBetween(Date endContractStart, Date endContractEnd) {return employeeRepository.findByEndContractBetween(endContractStart, endContractEnd);}
-
-    @Override
     public List<Employee> findAll() {return employeeRepository.findAll();}
 
 
@@ -42,30 +38,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee updateEndContract(Long id, Date endContract) {
-        Employee employeeDB = employeeRepository.findById(id).orElse(null);
-        if (employeeDB == null) return null;
-        employeeDB.setEndContract(endContract);
-        return employeeRepository.save(employeeDB);
-    }
-
-    @Override
-    public Employee updateContractType(Long id, String contractType) {
-        Employee employeeDB = employeeRepository.findById(id).orElse(null);
-        if (employeeDB == null) return null;
-        employeeDB.setContractType(ContractType.valueOf(contractType));
-        return employeeRepository.save(employeeDB);
-    }
-
-    @Override
     public Employee save(Employee employee) {return employeeRepository.save(employee);}
 
     @Override
     public Employee update(Employee employee) {
         Employee employeeDB = employeeRepository.findById(employee.getId()).orElse(null);
         if (employeeDB == null) return null;
-        employeeDB.setContractType(employee.getContractType());
-        employeeDB.setEndContract(employee.getEndContract());
         employeeDB.setStatusId(employee.getStatusId());
         return employeeRepository.save(employeeDB);
     }

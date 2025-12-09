@@ -1,8 +1,14 @@
 package com.sysconnect.dev.erp_proyect.entity_service.service;
 
+import com.sysconnect.dev.erp_proyect.entity_service.dto.CustomerCreateDto;
+import com.sysconnect.dev.erp_proyect.entity_service.dto.MessageDto;
 import com.sysconnect.dev.erp_proyect.entity_service.entity.Customer;
-import com.sysconnect.dev.erp_proyect.entity_service.enums.EmailStatus;
+import com.sysconnect.dev.erp_proyect.entity_service.entity.Entitie;
+import com.sysconnect.dev.erp_proyect.entity_service.enums.EntitieType;
+import com.sysconnect.dev.erp_proyect.entity_service.enums.Sex;
+import com.sysconnect.dev.erp_proyect.entity_service.feignclients.StatusFeignClient;
 import com.sysconnect.dev.erp_proyect.entity_service.repository.CustomerRepository;
+import com.sysconnect.dev.erp_proyect.entity_service.repository.EntitieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,64 +23,78 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    @Override
-    public Customer findById(Long id) {return customerRepository.findById(id).orElse(null);}
+    @Autowired
+    private EntitieRepository entitieRepository;
+
+    @Autowired
+    private StatusFeignClient feignClient;
+
 
     @Override
-    public Customer findByEntitie_Id(Long id) {return customerRepository.findByEntitie_Id(id).orElse(null); }
+    public Customer findByEntitie_Id(Long id) {return customerRepository.findByEntitie_Id(id).orElse(null);}
 
     @Override
-    public List<Customer> findAll() {return customerRepository.findAll();}
-
-    @Override
-    public List<Customer> findByLastPurchaseBefore(Date lastPurchase) {return customerRepository.findByLastPurchaseBefore(lastPurchase);}
+    public List<Customer> findByNamesOrLastNamesContaining(String searchText) { return customerRepository.findByNamesOrLastNamesContaining(searchText); }
 
     @Override
     public List<Customer> findByStatusId(Long statusId) {return customerRepository.findByStatusId(statusId);}
 
     @Override
-    public List<Customer> findByEmailStatus(EmailStatus emailStatus) {return customerRepository.findByEmailStatus(emailStatus);}
+    public List<Customer> findByBirthDate(Date birthDate) {return customerRepository.findByBirthDate(birthDate);}
 
     @Override
-    public Optional<Customer> findByEmail(String email) {return customerRepository.findByEmail(email);}
+    public List<Customer> findBySex(Sex sex) {return customerRepository.findBySex(sex);}
 
     @Override
-    public Customer updateLastPurchase(Long id, Date lastPurchase) {
-        Customer customerBD = customerRepository.findById(id).orElse(null);
-        if (customerBD == null) return null;
-        customerBD.setLastPurchase(lastPurchase);
-        return customerRepository.save(customerBD);
+    public List<Customer> findByFirstPurchaseBetween(Date firstPurchaseStart, Date firstPurchaseEnd) {return customerRepository.findByFirstPurchaseBetween(firstPurchaseStart,firstPurchaseEnd); }
+
+    @Override
+    public List<Customer> findByLastPurchaseBetween(Date lastPurchaseStart, Date lastPurchaseEnd) {return customerRepository.findByLastPurchaseBetween(lastPurchaseStart,lastPurchaseEnd); }
+
+    @Override
+    public List<Customer> findAll() {
+        return customerRepository.findAll();
     }
 
     @Override
-    public Customer updateStatus(Long id, Long statusId) {
-        Customer customerBD = customerRepository.findById(id).orElse(null);
-        if (customerBD == null) return null;
-        customerBD.setStatusId(statusId);
-        return customerRepository.save(customerBD);
-    }
+    public MessageDto save(CustomerCreateDto dto) {
+        Entitie entitieDB = entitieRepository.findByRut(dto.getRut()).orElse(null);
+        if(entitieDB == null) {
+            entitieDB = entitieRepository.save(Entitie.builder()
+                    .rut(dto.getRut())
+                    .entitieType(EntitieType.valueOf(dto.getEntityType()))
+                    .build());
+        }
+        Customer customerDB = new Customer();
+        customerDB.setNames(dto.getNames());
+        customerDB.setLastNames(dto.getLastNames());
+        customerDB.setBirthDate(dto.getBirthDate());
+        customerDB.setSex(dto.getSex());
+        customerDB.setStatus(feignClient.getStatusByCodint("STS_CLIENTE_VIGENTE").getBody());
 
-    @Override
-    public Customer save(Customer customer) {return customerRepository.save(customer);}
+        return new MessageDto("Cliente '" + dto.getNames() + " " + dto.getLastNames() + " creado exitosamente");
+
+    }
 
     @Override
     public Customer update(Customer customer) {
-        Customer customerBD = customerRepository.findById(customer.getId()).orElse(null);
-        if (customerBD == null) return null;
-        customerBD.setEntitie(customer.getEntitie());
-        customerBD.setLastPurchase(customer.getLastPurchase());
-        customerBD.setStatus(customer.getStatus());
-        return customerRepository.save(customerBD);
+        Customer customerDB = customerRepository.findById(customer.getId()).orElse(null);
+        if (customerDB == null) return null;
+        customerDB.setNames(customer.getNames());
+        customerDB.setLastNames(customer.getLastNames());
+        customerDB.setStatusId(customer.getStatusId());
+        customerDB.setBirthDate(customer.getBirthDate());
+        customerDB.setSex(customer.getSex());
+        customerDB.setFirstPurchase(customer.getFirstPurchase());
+        customerDB.setLastPurchase(customer.getLastPurchase());
+        return customerRepository.save(customerDB);
     }
 
     @Override
-    public Customer delete(Long id) {
-        Customer customerBD = customerRepository.findById(id).orElse(null);
-        if (customerBD == null) return null;
-        customerRepository.delete(customerBD);
-        return customerBD;
+    public MessageDto delete(Long id) {
+        Customer customerDB = customerRepository.findById(id).orElse(null);
+        if (customerDB == null ) return null;
+        customerRepository.delete(customerDB);
+        return new MessageDto("Cliente '" + customerDB.getNames()+" "+customerDB.getLastNames()+ " eliminado exitosamente");
     }
-
-
-
 }
