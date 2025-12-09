@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/status")
+@RequestMapping("api/status/")
 @CrossOrigin(origins = "http://localhost:4200")
 public class StatusController {
 

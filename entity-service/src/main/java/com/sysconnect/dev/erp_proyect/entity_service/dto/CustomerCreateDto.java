@@ -12,8 +12,6 @@ import java.util.Date;
 @Builder
 public class CustomerCreateDto {
 
-    private Long id;
-
     private String rut;
 
     private String entityType;

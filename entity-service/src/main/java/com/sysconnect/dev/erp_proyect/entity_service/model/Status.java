@@ -10,6 +10,8 @@ import lombok.*;
 @ToString
 public class Status {
 
+    private Long id;
+
     private String name;
 
     private String codint;

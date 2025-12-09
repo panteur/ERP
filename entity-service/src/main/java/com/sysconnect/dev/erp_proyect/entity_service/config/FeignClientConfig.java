@@ -7,40 +7,26 @@ import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
-@Configuration
 public class FeignClientConfig {
-
-    @Bean
-    public OAuth2AuthorizedClientManager authorizedClientManager(
-            ClientRegistrationRepository clientRegistrationRepository,
-            OAuth2AuthorizedClientRepository authorizedClientRepository) {
-
-        OAuth2AuthorizedClientProvider authorizedClientProvider =
-                OAuth2AuthorizedClientProviderBuilder.builder()
-                        .clientCredentials()
-                        .build();
-
-        DefaultOAuth2AuthorizedClientManager authorizedClientManager =
-                new DefaultOAuth2AuthorizedClientManager(
-                        clientRegistrationRepository, authorizedClientRepository);
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-        return authorizedClientManager;
-    }
 
     @Bean
     public RequestInterceptor requestInterceptor(OAuth2AuthorizedClientManager authorizedClientManager) {
         return requestTemplate -> {
+            // Define la solicitud de autorización para el cliente "master-data-service"
             OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
                     .withClientRegistrationId("master-data-service")
-                    .principal("entity-service-principal")
+                    .principal("entity-service") // El nombre del servicio que solicita el token
                     .build();
 
+            // Obtiene el cliente autorizado (y con él, el token de acceso)
             OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
 
             if (authorizedClient != null && authorizedClient.getAccessToken() != null) {
-                requestTemplate.header("Authorization", "Bearer " + authorizedClient.getAccessToken().getTokenValue());
+                OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+                // Añade la cabecera "Authorization: Bearer <token>" a la solicitud Feign
+                requestTemplate.header("Authorization", "Bearer " + accessToken.getTokenValue());
             }
         };
     }

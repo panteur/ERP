@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Administración", description = "Endpoints para tareas administrativas de usuarios")
 public class AdminController {
 
+    @Autowired
     private final AppUserService appUserService;
 
     @Operation(summary = "Asignar roles a un usuario", description = "Asigna una lista de roles a un usuario específico.")

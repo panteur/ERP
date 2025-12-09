@@ -10,6 +10,7 @@ import com.sysconnect.dev.erp_proyect.authentication_service.repository.RoleRepo
 import com.sysconnect.dev.erp_proyect.authentication_service.utils.GeneradorCadenasAleatorias;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,10 +29,13 @@ import static com.sysconnect.dev.erp_proyect.authentication_service.utils.Genera
 @Slf4j
 public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
+    @Autowired
     private final AppUserRepository appUserRepository;
+    @Autowired
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    @Autowired
     private final StatusFeignClient statusFeignClient;
 
     @Override
@@ -295,7 +299,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
     @Override
     public MessageDto resetPassword(ResetPasswordRequestDto dto) {
-        AppUser appUser = appUserRepository.findByUsernameAndRut(dto.username(), dto.rut())
+        AppUser appUser = appUserRepository.findByUsernameAndEmail(dto.username(),  dto.email())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con el nombre de usuario y RUT proporcionados."));
 
         String newPassword = generarCadenaAleatoria(8);
